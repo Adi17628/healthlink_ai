@@ -1,11 +1,11 @@
 ## 1. Team Information
 - *Project Title:* HealthLink AI – Bringing Health Guidance to Every Corner of India
 - *Team Members:*
-  1. [shahirshaik](https://github.com/shahirshaik)  
-2. [adityaannamdevula](https://github.com/adityaannamdevula)  
-3. [mokshagyna](https://github.com/mokshagyna)  
-4. [Subhash017](https://github.com/Subhash017)  
-5. [Bukkebharathnaik123](https://github.com/Bukkebharathnaik123)   
+1. [Shahir Shaik](https://code.swecha.org/shahirshaik)  
+2. [Aditya Annamdevula](https://code.swecha.org/adityaannamdevula)  
+3. [Mokshagyna](https://code.swecha.org/mokshagyna)  
+4. [Subhash](https://code.swecha.org/Subhash017)  
+5. [Bukke Bharath](https://code.swecha.org/Bukkebharathnaik123)   
 
 ---
 
