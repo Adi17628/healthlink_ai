@@ -4,6 +4,13 @@ from google.genai import types
 import time
 from PIL import Image
 import io
+import tempfile
+import os
+
+# --------------------------
+# 🔑 Hardcoded Gemini API Key
+# --------------------------
+API_KEY = "AIzaSyD_6zAY8E0wT8zrAr1dvnh_RrU4hmX9Jck"
 
 # Page configuration
 st.set_page_config(
@@ -23,18 +30,15 @@ st.markdown("""
         margin-bottom: 2rem;
         color: white;
     }
-    
     .main-title {
         font-size: 3rem;
         font-weight: bold;
         margin-bottom: 0.5rem;
     }
-    
     .main-subtitle {
         font-size: 1.2rem;
         opacity: 0.9;
     }
-    
     .feature-card {
         background: #343a40;
         padding: 1.5rem;
@@ -42,7 +46,6 @@ st.markdown("""
         border-left: 4px solid #667eea;
         margin: 1rem 0;
     }
-    
     .response-container {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 1.5rem;
@@ -50,23 +53,19 @@ st.markdown("""
         margin: 1rem 0;
         color: white;
     }
-    
     .stTabs [data-baseweb="tab-list"] {
         gap: 2rem;
     }
-    
     .stTabs [data-baseweb="tab"] {
         height: 3rem;
         background-color: #f0f2f6;
         border-radius: 10px;
         padding: 0 1.5rem;
     }
-    
     .stTabs [aria-selected="true"] {
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         color: white;
     }
-    
     .warning-box {
         background-color: #fff3cd;
         border: 1px solid #ffeaa7;
@@ -74,7 +73,6 @@ st.markdown("""
         padding: 1rem;
         margin: 1rem 0;
     }
-    
     .success-box {
         background-color: #d4edda;
         border: 1px solid #c3e6cb;
@@ -136,10 +134,6 @@ You are a helpful health assistant that provides both symptom guidance and medic
 - Focus on evidence-based information only
 """
 
-# Initialize session state
-if 'api_key' not in st.session_state:
-    st.session_state.api_key = ''
-
 # Header
 st.markdown("""
 <div class="main-header">
@@ -149,42 +143,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# API Key input in sidebar
-with st.sidebar:
-    st.markdown("### 🔐 API Configuration")
-    api_key = st.text_input(
-        "Enter your Google Gemini API Key:",
-        type="password",
-        value=st.session_state.api_key,
-        help="Get your API key from Google AI Studio"
-    )
-    if api_key:
-        st.session_state.api_key = api_key
-        st.success("✅ API Key configured!")
-    
-    st.markdown("---")
-    st.markdown("""
-    ### 📋 How to Use
-    1. **Text Query**: Ask about symptoms or medicine names
-    2. **Image Analysis**: Upload medical images for analysis
-    3. Get instant AI-powered health guidance
-    
-    ### ⚠️ Important Notice
-    This tool provides general information only and should not replace professional medical advice.
-    """)
-
-# Check if API key is provided
-if not st.session_state.api_key:
-    st.warning("⚠️ Please enter your Google Gemini API key in the sidebar to continue.")
-    st.stop()
-
 # Initialize Gemini client
 @st.cache_resource
 def init_gemini_client(api_key):
     return genai.Client(api_key=api_key)
 
 try:
-    client = init_gemini_client(st.session_state.api_key)
+    client = init_gemini_client(API_KEY)
 except Exception as e:
     st.error(f"❌ Failed to initialize Gemini client: {str(e)}")
     st.stop()
@@ -197,7 +162,6 @@ with tab1:
     
     # Feature cards
     col1, col2 = st.columns(2)
-    
     with col1:
         st.markdown("""
         <div class="feature-card">
@@ -205,7 +169,6 @@ with tab1:
             <p>Describe your symptoms and get first aid recommendations, self-care tips, and guidance on when to seek medical help.</p>
         </div>
         """, unsafe_allow_html=True)
-    
     with col2:
         st.markdown("""
         <div class="feature-card">
@@ -273,13 +236,10 @@ with tab2:
     )
     
     if uploaded_file is not None:
-        # Display uploaded image
         col1, col2 = st.columns([1, 2])
-        
         with col1:
             image = Image.open(uploaded_file)
             st.image(image, caption="Uploaded Image", use_container_width=True)
-        
         with col2:
             st.markdown("**Image Details:**")
             st.write(f"• **Filename:** {uploaded_file.name}")
@@ -291,23 +251,13 @@ with tab2:
         if st.button("🔬 Analyze Image", type="primary", use_container_width=True):
             with st.spinner("🔍 Analyzing your medical image..."):
                 try:
-                    # Upload file to Gemini
                     file_data = uploaded_file.getvalue()
-                    temp_file = io.BytesIO(file_data)
-                    
-                    # Create a temporary file for upload
-                    import tempfile
-                    import os
-                    
                     with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as tmp_file:
                         tmp_file.write(file_data)
                         tmp_file_path = tmp_file.name
                     
                     try:
-                        # Upload to Gemini
                         my_file = client.files.upload(file=tmp_file_path)
-                        
-                        # Generate response
                         response = client.models.generate_content(
                             model="gemini-2.5-flash",
                             config=types.GenerateContentConfig(
@@ -324,17 +274,13 @@ with tab2:
                         
                         st.markdown(response.text)
                         
-                        # Success box
                         st.markdown("""
                         <div class="success-box">
                             <strong>✅ Analysis Complete:</strong> The AI has analyzed your image and provided relevant health information.
                         </div>
                         """, unsafe_allow_html=True)
-                        
                     finally:
-                        # Clean up temporary file
                         os.unlink(tmp_file_path)
-                        
                 except Exception as e:
                     st.error(f"❌ Error analyzing image: {str(e)}")
     else:
