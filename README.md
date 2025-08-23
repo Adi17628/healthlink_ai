@@ -5,6 +5,11 @@ Built with **Streamlit** and powered by **Google Gemini API**, HealthLink AI hel
 
 ---
 
+### Demo  
+👉 [Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/Adi222111/healthlink_ai)  
+
+---
+
 ## 📋 Table of Contents
 - [Overview](#-overview)
 - [Features](#-features)
