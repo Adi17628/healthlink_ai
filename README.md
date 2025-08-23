@@ -55,16 +55,19 @@ The system ensures responses are:
 
 ---
 
+
 ## 📁 Project Structure  
 ```
 healthlink_ai/ 
-├── README.md 
-├── REPORT.md  
 ├── CHANGELOG.md              
 ├── CONTRIBUTING.md           
-├── LICENSE    
-├── health.py 
+├── LICENSE     
+├── README.md 
+├── REPORT.md  
+├── User-Acquisition-strategy.md
+├── health.py
 ├── requirements.txt
+
 ```
 
 ---
