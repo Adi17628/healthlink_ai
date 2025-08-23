@@ -87,7 +87,7 @@ healthlink_ai/
 ```bash
 git clone https://code.swecha.org/adityaannamdevula/healthlink_ai
 
-cd healthlink-ai
+cd healthlink_ai
 ```
 2. Install dependencies
 ```bash
