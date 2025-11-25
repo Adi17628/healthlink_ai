@@ -10,7 +10,7 @@ import os
 # --------------------------
 # 🔑 Hardcoded Gemini API Key
 # --------------------------
-API_KEY = "AIzaSyD_6zAY8E0wT8zrAr1dvnh_RrU4hmX9Jck"
+API_KEY = ""
 
 # Page configuration
 st.set_page_config(
