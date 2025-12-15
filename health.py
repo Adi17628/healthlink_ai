@@ -8,9 +8,20 @@ import tempfile
 import os
 
 # --------------------------
-# 🔑 Hardcoded Gemini API Key
+# 🔑 Gemini API Key Input
 # --------------------------
-API_KEY = ""
+with st.sidebar:
+    st.markdown("## 🔑 Gemini API Key")
+    user_api_key = st.text_input(
+        "Enter your Gemini API Key",
+        type="password",
+        help="Your API key is used only for this session and is never stored."
+    )
+    st.markdown(
+        "Get your API key from: https://ai.google.dev/",
+        unsafe_allow_html=True
+    )
+
 
 # Page configuration
 st.set_page_config(
@@ -144,14 +155,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Initialize Gemini client
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def init_gemini_client(api_key):
     return genai.Client(api_key=api_key)
 
+if not user_api_key:
+    st.warning("⚠️ Please enter your Gemini API key in the sidebar to use HealthLink AI.")
+    st.stop()
+
 try:
-    client = init_gemini_client(API_KEY)
+    client = init_gemini_client(user_api_key)
 except Exception as e:
-    st.error(f"❌ Failed to initialize Gemini client: {str(e)}")
+    st.error(f"❌ Invalid API Key or failed to initialize Gemini client: {str(e)}")
     st.stop()
 
 # Main content tabs
@@ -240,18 +255,26 @@ with tab2:
         with col1:
             image = Image.open(uploaded_file)
             st.image(image, caption="Uploaded Image", use_container_width=True)
+
         with col2:
             st.markdown("**Image Details:**")
             st.write(f"• **Filename:** {uploaded_file.name}")
             st.write(f"• **File Size:** {uploaded_file.size / 1024:.1f} KB")
             st.write(f"• **Image Format:** {image.format}")
             st.write(f"• **Image Size:** {image.size[0]} x {image.size[1]} pixels")
-        
+
         # Analysis button
         if st.button("🔬 Analyze Image", type="primary", use_container_width=True):
             with st.spinner("🔍 Analyzing your medical image..."):
                 try:
+                    # Upload file to Gemini
                     file_data = uploaded_file.getvalue()
+                    temp_file = io.BytesIO(file_data)
+                    
+                    # Create a temporary file for upload
+                    import tempfile
+                    import os
+                    
                     with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as tmp_file:
                         tmp_file.write(file_data)
                         tmp_file_path = tmp_file.name
@@ -265,6 +288,8 @@ with tab2:
                             ),
                             contents=[my_file, "Analyze this medical image and provide health guidance for any symptoms or conditions you can identify."]
                         )
+
+
                         
                         st.markdown("""
                         <div class="response-container">
@@ -274,15 +299,20 @@ with tab2:
                         
                         st.markdown(response.text)
                         
+                        # Success box
                         st.markdown("""
                         <div class="success-box">
                             <strong>✅ Analysis Complete:</strong> The AI has analyzed your image and provided relevant health information.
                         </div>
                         """, unsafe_allow_html=True)
+                        
                     finally:
+                        # Clean up temporary file
                         os.unlink(tmp_file_path)
+                        
                 except Exception as e:
                     st.error(f"❌ Error analyzing image: {str(e)}")
+                
     else:
         st.info("📤 Please upload a medical image to get started with image analysis.")
 
